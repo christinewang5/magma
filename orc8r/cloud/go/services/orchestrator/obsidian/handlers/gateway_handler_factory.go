@@ -83,9 +83,9 @@ func GetPartialReadGatewayHandler(path string, model PartialGatewayModel, serdes
 
 			err := model.FromBackendModels(context.Background(), networkID, gatewayID)
 			if err == merrors.ErrNotFound {
-				return echo.NewHTTPError(http.StatusNotFound, err)
+				return echo.NewHTTPError(http.StatusNotFound, err.Error())
 			} else if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err)
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 			return c.JSON(http.StatusOK, model)
 		},
@@ -160,15 +160,15 @@ func GetReadGatewayDeviceHandler(path string, serdes serde.Registry) obsidian.Ha
 			reqCtx := c.Request().Context()
 			physicalID, err := configurator.GetPhysicalIDOfEntity(reqCtx, networkID, orc8r.MagmadGatewayType, gatewayID)
 			if err == merrors.ErrNotFound {
-				return echo.NewHTTPError(http.StatusNotFound, err)
+				return echo.NewHTTPError(http.StatusNotFound, err.Error())
 			} else if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err)
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 			device, err := device.GetDevice(reqCtx, networkID, orc8r.AccessGatewayRecordType, physicalID, serdes)
 			if err == merrors.ErrNotFound {
-				return echo.NewHTTPError(http.StatusNotFound, err)
+				return echo.NewHTTPError(http.StatusNotFound, err.Error())
 			} else if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err)
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 
 			return c.JSON(http.StatusOK, device)
@@ -195,13 +195,13 @@ func GetUpdateGatewayDeviceHandler(path string, serdes serde.Registry) obsidian.
 			reqCtx := c.Request().Context()
 			physicalID, err := configurator.GetPhysicalIDOfEntity(reqCtx, networkID, orc8r.MagmadGatewayType, gatewayID)
 			if err == merrors.ErrNotFound {
-				return echo.NewHTTPError(http.StatusNotFound, err)
+				return echo.NewHTTPError(http.StatusNotFound, err.Error())
 			} else if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err)
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 			err = device.UpdateDevice(reqCtx, networkID, orc8r.AccessGatewayRecordType, physicalID, update, serdes)
 			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err)
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 			return c.NoContent(http.StatusNoContent)
 		},

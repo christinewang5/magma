@@ -142,7 +142,7 @@ func createTierHandler(c echo.Context) error {
 	entity := tier.ToNetworkEntity()
 	_, err := configurator.CreateEntity(c.Request().Context(), networkID, entity, serdes.Entity)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	return c.NoContent(http.StatusCreated)
 }
@@ -181,7 +181,7 @@ func readTierHandler(c echo.Context) error {
 		serdes.Entity,
 	)
 	if err == merrors.ErrNotFound {
-		return echo.NewHTTPError(http.StatusNotFound, err)
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
@@ -197,7 +197,7 @@ func deleteTierHandler(c echo.Context) error {
 	}
 	err := configurator.DeleteEntity(c.Request().Context(), networkID, orc8r.UpgradeTierEntityType, tierID)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	return c.NoContent(http.StatusNoContent)
 }
@@ -238,7 +238,7 @@ func deleteImage(c echo.Context) error {
 	reqCtx := c.Request().Context()
 	update, err := (&models.TierImage{}).ToDeleteImageUpdateCriteria(reqCtx, networkID, tierID, params[0])
 	if err == merrors.ErrNotFound {
-		return echo.NewHTTPError(http.StatusNotFound, err)
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
@@ -257,13 +257,13 @@ func createTierGateway(c echo.Context) error {
 	}
 	var gatewayID string
 	if err := c.Bind(&gatewayID); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	update := (&models.TierGateways{}).ToAddGatewayUpdateCriteria(tierID, gatewayID)
 	_, err := configurator.UpdateEntity(c.Request().Context(), networkID, update, serdes.Entity)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	return c.NoContent(http.StatusNoContent)
 }
@@ -280,7 +280,7 @@ func deleteTierGateway(c echo.Context) error {
 	update := (&models.TierGateways{}).ToDeleteGatewayUpdateCriteria(tierID, gatewayID)
 	_, err := configurator.UpdateEntity(c.Request().Context(), networkID, update, serdes.Entity)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	return c.NoContent(http.StatusNoContent)
 }

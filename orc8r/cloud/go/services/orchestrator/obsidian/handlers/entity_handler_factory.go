@@ -75,9 +75,9 @@ func GetPartialReadEntityHandler(path string, paramName string, model PartialEnt
 
 			err := model.FromBackendModels(c.Request().Context(), networkID, key)
 			if err == errors.ErrNotFound {
-				return echo.NewHTTPError(http.StatusNotFound, err)
+				return echo.NewHTTPError(http.StatusNotFound, err.Error())
 			} else if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err)
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 			return c.JSON(http.StatusOK, model)
 		},
@@ -116,11 +116,11 @@ func GetPartialUpdateEntityHandler(path string, paramName string, model PartialE
 			reqCtx := c.Request().Context()
 			updates, err := requestedUpdate.(PartialEntityModel).ToUpdateCriteria(reqCtx, networkID, key)
 			if err != nil {
-				return echo.NewHTTPError(http.StatusBadRequest, err)
+				return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 			}
 			_, err = configurator.UpdateEntities(reqCtx, networkID, updates, serdes)
 			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err)
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 			return c.NoContent(http.StatusNoContent)
 		},

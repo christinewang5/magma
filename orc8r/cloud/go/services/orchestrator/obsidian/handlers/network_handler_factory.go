@@ -93,11 +93,11 @@ func GetPartialReadNetworkHandler(path string, model PartialNetworkModel, serdes
 			if err == merrors.ErrNotFound {
 				return echo.NewHTTPError(http.StatusNotFound, err)
 			} else if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err)
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 			ret := model.GetFromNetwork(network)
 			if ret == nil {
-				return echo.NewHTTPError(http.StatusNotFound, fmt.Errorf("Not found"))
+				return echo.NewHTTPError(http.StatusNotFound, err)
 			}
 			return c.JSON(http.StatusOK, ret)
 		},
@@ -134,18 +134,18 @@ func GetPartialUpdateNetworkHandler(path string, model PartialNetworkModel, serd
 			reqCtx := c.Request().Context()
 			network, err := configurator.LoadNetwork(reqCtx, networkID, true, true, serdes)
 			if err == merrors.ErrNotFound {
-				return echo.NewHTTPError(http.StatusNotFound, err)
+				return echo.NewHTTPError(http.StatusNotFound, err.Error())
 			} else if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err)
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 
 			updateCriteria, err := requestedUpdate.(PartialNetworkModel).ToUpdateCriteria(network)
 			if err != nil {
-				return echo.NewHTTPError(http.StatusBadRequest, err)
+				return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 			}
 			err = configurator.UpdateNetworks(reqCtx, []configurator.NetworkUpdateCriteria{updateCriteria}, serdes)
 			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err)
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 			return c.NoContent(http.StatusNoContent)
 		},

@@ -278,7 +278,7 @@ func GetParamValues(c echo.Context, paramNames ...string) ([]string, *echo.HTTPE
 	for _, paramName := range paramNames {
 		val := c.Param(paramName)
 		if val == "" {
-			return []string{}, echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("invalid/missing param %s", paramName))
+			return []string{}, echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("invalid/missing param %s", paramName).Error())
 		}
 		ret = append(ret, val)
 	}

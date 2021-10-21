@@ -86,15 +86,15 @@ func GetSpecHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		service, ok, err := getServiceName(c.Param("service"))
 		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err)
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 		if !ok {
-			return echo.NewHTTPError(http.StatusNotFound, errors.New("service not found"))
+			return echo.NewHTTPError(http.StatusNotFound, "service not found")
 		}
 
 		yamlSpec, err := swagger.GetServiceSpec(service)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err)
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 
 		return c.String(http.StatusOK, yamlSpec)

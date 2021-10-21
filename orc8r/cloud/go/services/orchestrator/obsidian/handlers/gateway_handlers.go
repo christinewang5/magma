@@ -199,7 +199,7 @@ func CreateGateway(c echo.Context, model MagmadEncompassingGateway, entitySerdes
 		assignedEnt, err := configurator.LoadEntityForPhysicalID(reqCtx, deviceID, configurator.EntityLoadCriteria{}, entitySerdes)
 		switch {
 		case err == nil:
-			return echo.NewHTTPError(http.StatusBadRequest, errors.Errorf("device %s is already mapped to gateway %s", deviceID, assignedEnt.Key))
+			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("device %s is already mapped to gateway %s", deviceID, assignedEnt.Key))
 		case err != merrors.ErrNotFound:
 			return echo.NewHTTPError(http.StatusInternalServerError, errors.Wrap(err, "failed to check for existing device assignment"))
 		}
@@ -429,16 +429,16 @@ func GetStateHandler(c echo.Context) error {
 	reqCtx := c.Request().Context()
 	physicalID, err := configurator.GetPhysicalIDOfEntity(reqCtx, networkID, orc8r.MagmadGatewayType, gatewayID)
 	if err == merrors.ErrNotFound {
-		return echo.NewHTTPError(http.StatusNotFound, err)
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	} else if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	st, err := wrappers.GetGatewayStatus(reqCtx, networkID, physicalID)
 	if err == merrors.ErrNotFound {
-		return echo.NewHTTPError(http.StatusNotFound, err)
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	} else if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, st)
