@@ -25,8 +25,9 @@ import (
 
 // A little Go "polymorphism" magic for testing
 type TestHealthServer struct {
-	HealthServer
-	Feg1 bool //boolean to simulate requests coming from more than 1 FeG
+	HealthServer      HealthServer
+	CloudHealthServer CloudHealthServer
+	Feg1              bool //boolean to simulate requests coming from more than 1 FeG
 }
 
 // Health receiver for testHealthServer injects GW Identity into CTX if it's
@@ -54,6 +55,9 @@ func NewTestHealthServer(mockFactory blobstore.StoreFactory) (*TestHealthServer,
 	}
 	return &TestHealthServer{
 		HealthServer: HealthServer{
+			store: store,
+		},
+		CloudHealthServer: CloudHealthServer{
 			store: store,
 		},
 		Feg1: true,

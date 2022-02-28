@@ -17,7 +17,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/thoas/go-funk"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -50,34 +49,6 @@ func (srv *sbConfiguratorServicer) GetMconfig(ctx context.Context, void *protos.
 		return nil, status.Errorf(codes.PermissionDenied, "gateway not registered")
 	}
 	return srv.getMconfigImpl(gw.NetworkId, gw.LogicalId)
-}
-
-func (srv *sbConfiguratorServicer) GetMconfigInternal(ctx context.Context, req *cfg_protos.GetMconfigRequest) (*cfg_protos.GetMconfigResponse, error) {
-	store, err := srv.factory.StartTransaction(context.Background(), &orc8r_storage.TxOptions{ReadOnly: true})
-	if err != nil {
-		storage.RollbackLogOnError(store)
-		return nil, status.Errorf(codes.Aborted, "failed to start transaction: %s", err)
-	}
-
-	// Network ID isn't used in a physical ID query
-	loadResult, err := store.LoadEntities("", storage.EntityLoadFilter{PhysicalID: &wrappers.StringValue{Value: req.HardwareID}}, storage.EntityLoadCriteria{})
-	if err != nil {
-		storage.RollbackLogOnError(store)
-		return nil, status.Errorf(codes.Internal, "failed to load entity for gateway %s: %s", req.HardwareID, err)
-	}
-	if funk.IsEmpty(loadResult.Entities) {
-		storage.RollbackLogOnError(store)
-		return nil, status.Errorf(codes.NotFound, "did not find gateway for ID %s", req.HardwareID)
-	}
-
-	storage.CommitLogOnError(store)
-
-	ent := loadResult.Entities[0]
-	cfg, err := srv.getMconfigImpl(ent.NetworkID, ent.Key)
-	if err != nil {
-		return nil, err
-	}
-	return &cfg_protos.GetMconfigResponse{Configs: cfg, LogicalID: ent.Key}, nil
 }
 
 func (srv *sbConfiguratorServicer) getMconfigImpl(networkID string, gatewayID string) (*protos.GatewayConfigs, error) {
